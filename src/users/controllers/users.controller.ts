@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Query,
   Put,
   Delete,
   Body,
@@ -10,18 +9,18 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { UsersService } from '../services/users.service';
 import { ParseIntPipe } from '@nestjs/common';
 import { CreateUserDto } from '../dtos/users.dtos';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
-  getProducts(@Query() params: any) {
-    const { limit, offset, brand } = params;
-    // return `limit =>${limit} offset=> ${offset} brand=> ${brand}`;
+  getProducts() {
     return this.usersService.findAll();
   }
 

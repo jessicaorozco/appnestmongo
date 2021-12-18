@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Query,
   Put,
   Delete,
   Body,
@@ -10,18 +9,20 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CustomersService } from '../services/customers.service';
 import { ParseIntPipe } from '@nestjs/common';
 import { CreateCustomerDto } from '../dtos/customers.dtos';
 
+@ApiTags('customers')
 @Controller('customers')
 export class CustomersController {
   constructor(private customersService: CustomersService) {}
 
   @Get()
-  getProducts(@Query() params: any) {
-    const { limit, offset, brand } = params;
-    // return `limit =>${limit} offset=> ${offset} brand=> ${brand}`;
+  getProducts() {
+    // const { limit, offset } = params;
+    // return `limit =>${limit} offset=> ${offset}`;
     return this.customersService.findAll();
   }
 
