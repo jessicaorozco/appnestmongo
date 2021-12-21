@@ -16,4 +16,13 @@ export class AppService {
 
     return `<h1>App Nest Mongo</h1>`;
   }
+
+  getDocs(): string {
+    const apikey = this.configService.apikey;
+    const dbname = this.configService.database;
+    console.log(apikey);
+    console.log(dbname);
+
+    return `<h1>App Nest Mongo</h1>`;
+  }
 }

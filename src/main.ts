@@ -11,6 +11,19 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+  const whitelist = [
+    'http://localhost:8080',
+    'https://appnestmongo.herokuapp.com/',
+  ];
+  const options = {
+    origin: (origin: any, callback: any) => {
+      if (whitelist.includes(origin) || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('no permitido'));
+      }
+    },
+  };
   const config = new DocumentBuilder()
     .setTitle('API nestjs nodejs')
     .setDescription('app test de nest con mongo')
@@ -19,7 +32,7 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
-  app.enableCors();
-  await app.listen(process.env.PORT || 5000);
+  app.enableCors(options);
+  await app.listen(process.env.PORT || 3000);
 }
 bootstrap();
