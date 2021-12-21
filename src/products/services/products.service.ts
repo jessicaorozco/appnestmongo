@@ -1,48 +1,48 @@
-import { Injectable } from '@nestjs/common';
-import { Product } from '../entities/product.entity';
+import { Injectable, NotFoundException } from '@nestjs/common';
+// import { productSchema } from '../schemas/productSchema';
+import { ProductSchema } from '../schemas/product.schema';
 import { CreateProductDto, UpdateProductDto } from '../dtos/products.dtos';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class ProductService {
-  private counterId = 1;
-  private products: Product[] = [];
-
+  constructor(
+    @InjectModel('Product') private productModel: Model<typeof ProductSchema>, // @InjectModel('Product') private productModel: Model<Product>,
+  ) {}
   async findAll() {
-    return this.products;
+    return await this.productModel.find().exec();
   }
 
-  async findOne(id: number) {
-    const product = this.products.find((item) => item.id === id);
+  async findOne(id: string) {
+    const product = await this.productModel.findById(id).exec();
+    if (!product) {
+      throw new NotFoundException(`Product # ${id} not found`);
+    }
     return product;
   }
 
-  async create(payload: CreateProductDto) {
-    console.log(payload);
-    this.counterId += 1;
-    const newProduct = {
-      id: this.counterId,
-      ...payload,
-    };
-    this.products.push(newProduct);
-    return newProduct;
+  async create(data: CreateProductDto) {
+    console.log(data);
+    const newProduct = new this.productModel(data);
+    return newProduct.save();
   }
 
-  async update(id: number, payload: UpdateProductDto) {
-    const product = await this.findOne(id);
-    const index = this.products.findIndex((item) => item.id === id);
-    const result = (this.products[index] = {
-      ...product,
-      ...payload,
-    });
-    return result;
-  }
-  async delete(id: number) {
-    const product = await this.findOne(id);
+  async update(id: string, changes: UpdateProductDto) {
+    const product = await this.productModel
+      .findByIdAndUpdate(id, { $set: changes }, { new: true })
+      .exec();
     if (!product) {
-      throw new Error('no exist');
+      throw new NotFoundException(`Product # ${id} not found`);
     }
-    const index = this.products.findIndex((item) => item.id === id);
-    const result = this.products[index];
-    return result;
+    return product;
+  }
+
+  async remove(id: string) {
+    const product = this.productModel.findOneAndDelete({ id });
+    if (!product) {
+      throw new NotFoundException(`Product # ${id} not found`);
+    }
+    return product;
   }
 }

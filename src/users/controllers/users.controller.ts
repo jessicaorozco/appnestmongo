@@ -11,8 +11,8 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UsersService } from '../services/users.service';
-import { ParseIntPipe } from '@nestjs/common';
-import { CreateUserDto } from '../dtos/users.dtos';
+
+import { CreateUserDto, UpdateUserDto } from '../dtos/users.dtos';
 
 @ApiTags('users')
 @Controller('users')
@@ -20,29 +20,26 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
-  getProducts() {
+  getUsers() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.ACCEPTED)
-  getOne(@Param('id', ParseIntPipe) id: string) {
+  getOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
   }
 
   @Post()
-  create(@Body() payload: CreateUserDto) {
-    return this.usersService.create(payload);
+  create(@Body() data: CreateUserDto) {
+    return this.usersService.create(data);
   }
   @Put(':id')
-  update(@Param('id') id: string, @Body() payload: any) {
-    return this.usersService.update(+id, payload);
+  update(@Param('id') id: string, @Body() data: UpdateUserDto) {
+    return this.usersService.update(+id, data);
   }
   @Delete(':id')
   delete(@Param('id') id: string) {
-    return {
-      id,
-      message: 'Product deleted',
-    };
+    return this.usersService.remove(+id);
   }
 }
